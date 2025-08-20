@@ -1,10 +1,8 @@
 import streamlit as st
-import pickle
-import numpy as np
+import joblib
 
-# Load the trained model
-with open("crop_recommendation_model.pkl", "rb") as f:
-    model = pickle.load(f)
+# Load the trained model with joblib
+model = joblib.load("model.pkl")
 
 st.title("🌱 Crop Recommendation System")
 
