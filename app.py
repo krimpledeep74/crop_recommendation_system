@@ -5,31 +5,41 @@ import numpy as np
 # Load the trained model
 model = joblib.load("crop_recommendation_model.pkl")
 
-# Streamlit app title
+# Title
+st.set_page_config(page_title="🌱 Crop Recommendation System", layout="centered")
 st.title("🌱 Crop Recommendation System")
+st.write("Enter soil and climate conditions to get the best crop recommendation.")
 
-st.write("Enter the soil and climate conditions below to get the best crop recommendation.")
+# Sidebar inputs
+st.sidebar.header("Soil & Climate Inputs")
+N = st.sidebar.slider("Nitrogen (N)", 0, 200, 50)
+P = st.sidebar.slider("Phosphorus (P)", 0, 200, 40)
+K = st.sidebar.slider("Potassium (K)", 0, 200, 40)
+temperature = st.sidebar.slider("Temperature (°C)", 0, 50, 25)
+humidity = st.sidebar.slider("Humidity (%)", 0, 100, 50)
+ph = st.sidebar.slider("Soil pH", 0.0, 14.0, 6.5)
+rainfall = st.sidebar.slider("Rainfall (mm)", 0.0, 300.0, 100.0)
 
-# User input fields
-N = st.number_input("Nitrogen (N)", min_value=0.0, step=1.0)
-P = st.number_input("Phosphorus (P)", min_value=0.0, step=1.0)
-K = st.number_input("Potassium (K)", min_value=0.0, step=1.0)
-temperature = st.number_input("Temperature (°C)", step=0.1)
-humidity = st.number_input("Humidity (%)", step=0.1)
-ph = st.number_input("Soil pH", step=0.1)
-rainfall = st.number_input("Rainfall (mm)", step=0.1)
+# Crop images dictionary
+crop_images = {
+    "rice": "https://upload.wikimedia.org/wikipedia/commons/6/65/Rice_plants.jpg",
+    "wheat": "https://upload.wikimedia.org/wikipedia/commons/4/41/Wheat_close-up.jpg",
+    "maize": "https://upload.wikimedia.org/wikipedia/commons/2/21/Maize_cob.jpg",
+    "sugarcane": "https://upload.wikimedia.org/wikipedia/commons/3/36/Sugarcane.jpg",
+    # Add more crops here
+}
 
-# Predict button
-if st.button("Recommend Crop"):
-    try:
-        # Prepare input data
-        input_data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
-        
-        # Predict crop
-        prediction = model.predict(input_data)
-        
-        # Show result
-        st.success(f"🌾 Recommended Crop: **{prediction[0]}**")
-    except Exception as e:
-        st.error(f"⚠️ An error occurred: {e}")
+# Predict crop instantly
+try:
+    input_data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
+    prediction = model.predict(input_data)
+    crop = prediction[0]
+
+    st.success(f"🌾 Recommended Crop: **{crop}**")
+
+    # Display crop image if available
+    if crop.lower() in crop_images:
+        st.image(crop_images[crop.lower()], caption=crop, use_column_width=True)
+except Exception as e:
+    st.error(f"⚠️ An error occurred: {e}")
 
